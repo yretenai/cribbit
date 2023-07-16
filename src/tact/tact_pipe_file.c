@@ -9,20 +9,25 @@
 #include <cribbit/cribbit.h>
 #include <cribbit/tact/tact_pipe_file.h>
 
+#include "../feature/string.h"
 #include "../cribbit_empty.h"
 
-const char CS_TACT_TYPE_STRING[] = "STRING";
-const char CS_TACT_TYPE_HEX[] = "HEX";
-const char CS_TACT_TYPE_DEC[] = "DEC";
 const char CS_SEQN[] = "## seqn = ";
 
 const char NAME_TYPE_SEPARATOR = '!';
 const char TYPE_WIDTH_SEPARATOR = ':';
-const char COLUMN_SEPARATOR[2] = "|";
+const char COLUMN_SEPARATOR = '|';
 const char ABORT_SEPARATOR = '#';
 
 const char NEWLINE[3] = "\r\n";
 
+const char* TACT_PIPE_COLUMN_NAME[] = {
+        "INVALID",
+        "STRING",
+        "HEX",
+        "DEC",
+        "MAX"
+};
 
 tact_pipe_file tact_pipe_parse(char* data) {
     tact_pipe_file file = CRIBBIT_EMPTY_TACT_PIPE_FILE;
@@ -33,7 +38,7 @@ tact_pipe_file tact_pipe_parse(char* data) {
     bool has_columns = false;
 
     char* next_line = NULL;
-    char* line = strtok_r(data, NEWLINE, &next_line); // PLEASE ADD STRTOK_S!!!
+    char* line = strtok_r(data, NEWLINE, &next_line);
     tact_pipe_row* current_row = file.rows;
     tact_pipe_column* current_column = file.columns;
     while (line != NULL) {
@@ -47,22 +52,30 @@ tact_pipe_file tact_pipe_parse(char* data) {
         }
 
         if (strlen(line) > 1) {
-            char* next_chunk = NULL;
-            char* chunk = strtok_r(line, COLUMN_SEPARATOR, &next_chunk);
+            char* chunk = strchr(line, COLUMN_SEPARATOR);
             if(chunk != NULL) {
+                chunk = line;
+
                 if (has_columns) {
                     current_row = cribbit_alloc_linked(current_row, sizeof(tact_pipe_row));
                     current_row->columns = cribbit_alloc(sizeof(char*) * file.column_count);
+                    cribbit_clear(current_row->columns, sizeof(char*) * file.column_count);
                 }
 
                 int idx = 0;
-                while (chunk != NULL) {
-                    if(next_chunk != NULL && next_chunk[-1] == COLUMN_SEPARATOR[0]) {
-                        next_chunk[-1] = 0;
-                    }
-
+                while (chunk != NULL && chunk[0] != 0) {
                     if (has_columns) {
                         current_row->columns[idx++] = chunk;
+
+                        if(idx >= (int) file.column_count) {
+                            break;
+                        }
+
+                        chunk = strchr(chunk, COLUMN_SEPARATOR);
+                        if(chunk != NULL) {
+                            chunk[0] = 0;
+                            chunk += 1;
+                        }
                     } else {
                         char* name_sep = strchr(chunk, NAME_TYPE_SEPARATOR);
                         if(name_sep == NULL) {
@@ -75,25 +88,33 @@ tact_pipe_file tact_pipe_parse(char* data) {
                             break;
                         }
                         *name_sep = 0;
+                        name_sep++;
                         *width_sep = 0;
+                        width_sep++;
 
-                        current_column = cribbit_alloc_linked(current_column, sizeof(tact_pipe_column));
                         file.column_count++;
 
+                        current_column = cribbit_alloc_linked(current_column, sizeof(tact_pipe_column));
                         current_column->name = chunk;
-                        current_column->width = (int32_t) strtoll(width_sep + 1, NULL, 10);
-                        if(strcmp(name_sep + 1, CS_TACT_TYPE_STRING) == 0) {
+                        current_column->width = (int32_t) strtoll(width_sep, NULL, 10);
+
+                        chunk = strchr(width_sep, COLUMN_SEPARATOR);
+                        if(chunk != NULL) {
+                            chunk[0] = 0;
+                            chunk += 1;
+                        }
+
+                        if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_STRING]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_STRING;
-                        }
-                        if(strcmp(name_sep + 1, CS_TACT_TYPE_HEX) == 0) {
+                        } else if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_HEX]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_HEX;
-                        }
-                        if(strcmp(name_sep + 1, CS_TACT_TYPE_DEC) == 0) {
+                        } else if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_DEC]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_DEC;
+                        }  else {
+                            current_column->type = TACT_PIPE_COLUMN_INVALID;
                         }
                         idx = -1;
                     }
-                    chunk = strtok_r(NULL, COLUMN_SEPARATOR, &next_chunk);
                 }
 
                 if(idx == -1) {
@@ -113,7 +134,7 @@ tact_pipe_file tact_pipe_parse(char* data) {
     return file;
 }
 
-tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, int32_t row, void** data, size_t* data_len) {
+tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, size_t row, void** data, size_t* data_len) {
     if (data == NULL || data_len == NULL) {
         return TACT_PIPE_COLUMN_INVALID;
     }
@@ -133,7 +154,7 @@ tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, in
     return TACT_PIPE_COLUMN_INVALID;
 }
 
-uint8_t ParseOctet(const char value) {
+uint8_t parse_octet(const char value) {
     if (value >= '0' && value <= '9') {
         return value - '0';
     } else if (value >= 'A' && value <= 'F') {
@@ -145,13 +166,18 @@ uint8_t ParseOctet(const char value) {
     }
 }
 
-tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, int32_t column, int32_t row, void** data, size_t* data_len) {
+tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, size_t column, size_t row, void** data, size_t* data_len) {
     if (data == NULL || data_len == NULL) {
         return TACT_PIPE_COLUMN_INVALID;
     }
 
-    tact_pipe_column* column_entry = cribbit_skip_linked(file->columns, column);
-    tact_pipe_row* row_entry = cribbit_skip_linked(file->rows, row);
+    tact_pipe_column *column_entry = cribbit_skip_linked(file->columns, column);
+    tact_pipe_row *row_entry = cribbit_skip_linked(file->rows, row);
+
+    return tact_pipe_convert(column, column_entry, row_entry, data, data_len);
+}
+
+tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_entry, tact_pipe_row* row_entry, void** data, size_t* data_len) {
     if(column_entry == NULL || row_entry == NULL) {
         *data = NULL;
         *data_len = 0;
@@ -162,22 +188,36 @@ tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, int32_t column, in
 
     switch(column_entry->type) {
         case TACT_PIPE_COLUMN_STRING: {
-            *data_len = strlen(column_value);
-            *data = malloc((*data_len) + 1);
-            memcpy(*data, column_value, *data_len);
+            if(column_value != NULL) {
+                *data_len = strlen(column_value);
+            } else {
+                *data_len = 0;
+            }
+
+            *data = column_value;
             break;
         }
         case TACT_PIPE_COLUMN_HEX: {
-            if (column_entry->width == 0 || ((uint32_t) column_entry->width << 1) > strlen(column_value)) {
+            if (column_entry->width == 0) {
                 *data = NULL;
                 *data_len = 0;
                 return TACT_PIPE_COLUMN_INVALID;
             }
 
-            *data = cribbit_alloc(sizeof(uint8_t) * column_entry->width);
+            uint8_t* hex = cribbit_alloc(sizeof(uint8_t) * column_entry->width);
+            cribbit_clear(hex, sizeof(uint8_t) * column_entry->width);
+            *data = hex;
             *data_len = column_entry->width;
-            for(int i = 0; i < column_entry->width; ++i) {
-                ((uint8_t*) data)[i] = (ParseOctet(column_value[i << 1]) << 4) | ParseOctet(column_value[(i << 1) + 1]);
+
+            if(column_value != NULL) {
+                int width = (int) strlen(column_value) >> 1;
+                if(width > column_entry->width) {
+                    width = column_entry->width;
+                }
+
+                for (int i = 0; i < width; ++i) {
+                    hex[i] = (parse_octet(column_value[i << 1]) << 4) | parse_octet(column_value[(i << 1) + 1]);
+                }
             }
             break;
         }
@@ -187,7 +227,6 @@ tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, int32_t column, in
                 *data_len = 0;
                 return TACT_PIPE_COLUMN_INVALID;
             }
-            *data = cribbit_alloc(sizeof(uint64_t));
             *data_len = column_entry->width;
             *data = (void *) strtoll(column_value, NULL, 10);
             break;

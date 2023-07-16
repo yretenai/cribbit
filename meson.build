@@ -12,8 +12,10 @@ incdir = include_directories('include/')
 
 cflags = []
 
-if meson.get_compiler('c').compiles('void test(main) { }', name: 'can use -fanalyzer', args: '-fanalyzer')
-  cflags += ['-fanalyzer']
+if meson.get_compiler('c').get_id() == 'gcc'
+    if meson.get_compiler('c').compiles('void test(main) { }', name: 'can use -fanalyzer', args: '-fanalyzer')
+      cflags += ['-fanalyzer']
+    endif
 endif
 
 subdir('src')

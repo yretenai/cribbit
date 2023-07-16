@@ -11,6 +11,8 @@
 
 #include <cribbit/tact/tact_pipe_file.h>
 
+#include <cribbit/shared.h>
+
 typedef enum RIBBIT_CLIENT_VERSION {
     RIBBIT_CLIENT_INVALID = 0,
 
@@ -56,9 +58,9 @@ typedef struct RIBBIT_RESPONSE {
     size_t cert_len;
 } ribbit_response;
 
-ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, const char* param);
-ribbit_response ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param);
-bool ribbit_verify_oscp(ribbit_response* resp);
-void ribbit_free(ribbit_response* response);
+CRIBBIT_SHARED ribbit_response CRIBBIT_DECL ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, const char* param);
+CRIBBIT_SHARED ribbit_response CRIBBIT_DECL ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param);
+CRIBBIT_SHARED bool CRIBBIT_DECL ribbit_verify_oscp(ribbit_response* resp);
+CRIBBIT_SHARED void CRIBBIT_DECL ribbit_free(ribbit_response* response);
 
 #endif //CRIBBIT_RIBBIT_CLIENT_H

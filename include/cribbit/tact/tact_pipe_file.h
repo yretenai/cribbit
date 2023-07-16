@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <cribbit/shared.h>
+
 typedef enum TACT_PIPE_COLUMN_TYPE {
     TACT_PIPE_COLUMN_INVALID,
 
@@ -17,6 +19,8 @@ typedef enum TACT_PIPE_COLUMN_TYPE {
 
     TACT_PIPE_COLUMN_MAX,
 } tact_pipe_column_type;
+
+extern CRIBBIT_SHARED const char* TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_MAX + 1];
 
 typedef struct TACT_PIPE_COLUMN {
     struct TACT_PIPE_COLUMN* next;
@@ -38,10 +42,11 @@ typedef struct TACT_PIPE_FILE {
     int64_t seqn;
 } tact_pipe_file;
 
-tact_pipe_file tact_pipe_parse(char* data);
-tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, int32_t row, void** data, size_t* data_len);
-tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, int32_t column, int32_t row, void** data, size_t* data_len);
-void tact_pipe_free_value(void* data);
-void tact_pipe_free(tact_pipe_file* file);
+CRIBBIT_SHARED tact_pipe_file CRIBBIT_DECL tact_pipe_parse(char* data);
+CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_get(tact_pipe_file* file, const char* column, size_t row, void** data, size_t* data_len);
+CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_get_idx(tact_pipe_file* file, size_t column, size_t row, void** data, size_t* data_len);
+CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_convert(size_t column, tact_pipe_column* column_entry, tact_pipe_row* row_entry, void** data, size_t* data_len);
+CRIBBIT_SHARED void CRIBBIT_DECL tact_pipe_free_value(void* data);
+CRIBBIT_SHARED void CRIBBIT_DECL tact_pipe_free(tact_pipe_file* file);
 
 #endif //CRIBBIT_TACT_PIPE_FILE_H

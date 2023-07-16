@@ -1,5 +1,4 @@
 executable('cribbit-test', ['main.c'],
-    include_directories: incdir,
-    link_with: cribbitlib,
+    dependencies: [cribbitdep],
     install: true,
     c_args: cflags)

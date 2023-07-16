@@ -1,4 +1,4 @@
-cribbitlib = shared_library('cribbit', [
+cribbitlib = library('cribbit', [
         'cribbit.c',
         'ribbit/ribbit_client.c',
         'ribbit/ribbit_v1.c',
@@ -9,3 +9,5 @@ cribbitlib = shared_library('cribbit', [
     dependencies : [threaddep],
     install: true,
     c_args: cflags + ['-DCRIBBIT_EXPORTING'])
+
+cribbitdep = declare_dependency(link_with: cribbitlib, include_directories: incdir)
