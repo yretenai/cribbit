@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <cribbit/tact/tact_pipe_file.h>
+
 typedef enum RIBBIT_CLIENT_VERSION {
     RIBBIT_CLIENT_INVALID = 0,
 
@@ -41,25 +43,22 @@ typedef enum RIBBIT_REGION {
 } ribbit_region;
 
 typedef struct RIBBIT_MIME {
-    char** key;
-    size_t key_len;
-    char** value;
-    size_t value_len;
     struct RIBBIT_MIME* next;
+    const char* key;
+    const char* value;
 } ribbit_mime;
 
 typedef struct RIBBIT_RESPONSE {
     ribbit_response_type type;
-    uint_least64_t seqn;
-    void* storage;
+    tact_pipe_file data;
     ribbit_mime* mime;
     uint8_t* cert;
     size_t cert_len;
 } ribbit_response;
 
-ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, char* param, size_t param_len);
-ribbit_response ribbit_fetch_direct(char* host, size_t host_len, int32_t port, ribbit_version version, ribbit_response_type type, char* param, size_t param_len);
-bool ribbit_verify_oscp(ribbit_response resp);
+ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, const char* param);
+ribbit_response ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param);
+bool ribbit_verify_oscp(ribbit_response* resp);
 void ribbit_free(ribbit_response* response);
 
 #endif //CRIBBIT_RIBBIT_CLIENT_H

@@ -3,9 +3,9 @@
 //
 
 #include "ribbit_v1.h"
+#include "../cribbit_empty.h"
 
-ribbit_response ribbit_v1_fetch(char* host, size_t host_len, int32_t port, ribbit_response_type type, char* param, size_t param_len) {
-    ribbit_response response = {RIBBIT_RESPONSE_INVALID, 0, NULL, NULL, NULL, 0};
-    // todo
+ribbit_response ribbit_v1_fetch(const char* host, int32_t port, ribbit_response_type type, const char* param) {
+    ribbit_response response = CRIBBIT_EMPTY_RIBBIT_RESPONSE;
     return response;
 }

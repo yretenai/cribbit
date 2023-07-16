@@ -2,6 +2,7 @@ project('cribbit', 'c',
     license : 'BSD0',
     default_options : [
         'prefix=/usr',
+        'c_std=c17',
         'warning_level=3'
     ])
 

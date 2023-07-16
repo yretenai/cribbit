@@ -1,4 +1,5 @@
 cribbitlib = shared_library('cribbit', [
+        'cribbit.c',
         'ribbit/ribbit_client.c',
         'ribbit/ribbit_v1.c',
         'ribbit/ribbit_v2.c',

@@ -2,17 +2,20 @@
 // Created by chronovore on 7/15/23.
 //
 
-#include <cribbit/ribbit/ribbit_client.h>
-
-#include <stdlib.h>
 #include <string.h>
+
+#include <cribbit/cribbit.h>
+#include <cribbit/ribbit/ribbit_client.h>
 
 #include "ribbit_v1.h"
 #include "ribbit_v2.h"
 
-const char RIBBIT_HOST[19] = ".version.battle.net";
+#include "../cribbit_empty.h"
 
-ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, char* param, size_t param_len) {
+const char RIBBIT_HOST[20] = ".version.battle.net";
+const int32_t RIBBIT_PORT = 1119;
+
+ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, const char* param) {
     char host[2 + sizeof(RIBBIT_HOST)];
 
     switch (region) {
@@ -28,56 +31,48 @@ ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbi
         default:
         case RIBBIT_REGION_INVALID:
         case RIBBIT_REGION_MAX: {
-            ribbit_response response = {RIBBIT_RESPONSE_INVALID, 0, NULL, NULL, NULL, 0};
+            ribbit_response response = CRIBBIT_EMPTY_RIBBIT_RESPONSE;
             return response;
         }
     }
 
-    memcpy((char*) &host[2], RIBBIT_HOST, sizeof(RIBBIT_HOST));
+    memcpy(&host[2], RIBBIT_HOST, sizeof(RIBBIT_HOST));
 
-    return ribbit_fetch_direct((char*) &host, sizeof(host), 1119, version, type, param, param_len);
+    return ribbit_fetch_direct((const char *) &host, RIBBIT_PORT, version, type, param);
 }
 
-ribbit_response ribbit_fetch_direct(char* host, size_t host_len, int32_t port, ribbit_version version, ribbit_response_type type, char* param, size_t param_len) {
+ribbit_response ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param) {
     switch (version) {
         case RIBBIT_CLIENT_V1:
-            return ribbit_v1_fetch(host, host_len, port, type, param, param_len);
+            return ribbit_v1_fetch(host, port, type, param);
         case RIBBIT_CLIENT_V2:
-            return ribbit_v2_fetch(host, host_len, port, type, param, param_len);
+            return ribbit_v2_fetch(host, port, type, param);
         default:
         case RIBBIT_CLIENT_INVALID:
         case RIBBIT_CLIENT_MAX: {
-            ribbit_response response = {RIBBIT_RESPONSE_INVALID, 0, NULL, NULL, NULL, 0};
+            ribbit_response response = CRIBBIT_EMPTY_RIBBIT_RESPONSE;
             return response;
         }
     }
 }
 
-bool ribbit_verify_oscp(ribbit_response resp) {
+bool ribbit_verify_oscp(ribbit_response* resp) {
     return false; // todo.
 }
 
 void ribbit_free(ribbit_response* response) {
+    tact_pipe_free(&response->data);
+
     if (response->type == RIBBIT_RESPONSE_INVALID) {
         return;
     }
 
-    ribbit_mime* mime = response->mime;
-    while (mime != NULL) {
-        void* current = mime;
-        mime = mime->next;
-        free(current);
-    }
+    cribbit_free_linked((struct cribbit_linked_shim *) response->mime);
     response->mime = NULL;
 
     if (response->cert != NULL) {
-        free(response->cert);
+        cribbit_free(response->cert);
         response->cert = NULL;
-    }
-
-    if (response->storage != NULL) {
-        free(response->storage);
-        response->storage = NULL;
     }
 
     response->type = RIBBIT_RESPONSE_INVALID;
