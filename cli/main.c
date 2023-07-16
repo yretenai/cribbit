@@ -33,6 +33,7 @@ void print_row(tact_pipe_row* row, tact_pipe_file* file) {
         void* data;
         size_t data_len;
         tact_pipe_column_type type = tact_pipe_convert(i, column_entry, row, &data, &data_len);
+        printf("%lld ", (int64_t) data_len);
         if(data != NULL) {
             switch (type) {
                 case TACT_PIPE_COLUMN_STRING:
@@ -60,7 +61,6 @@ void print_row(tact_pipe_row* row, tact_pipe_file* file) {
         } else {
             printf("<null> ");
         }
-        printf("\n");
     }
     printf("\n");
 }

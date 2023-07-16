@@ -8,7 +8,9 @@
 
 void* cribbit_alloc(size_t size) {
     // todo: make this configurable.
-    return malloc(size);
+    void* addr = malloc(size);
+    cribbit_clear(addr, size);
+    return addr;
 }
 
 void cribbit_clear(void* ptr, size_t size) {

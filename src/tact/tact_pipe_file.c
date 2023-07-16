@@ -10,7 +10,6 @@
 #include <cribbit/tact/tact_pipe_file.h>
 
 #include "../feature/string.h"
-#include "../cribbit_empty.h"
 
 const char CS_SEQN[] = "## seqn = ";
 
@@ -30,7 +29,7 @@ const char* TACT_PIPE_COLUMN_NAME[] = {
 };
 
 tact_pipe_file tact_pipe_parse(char* data) {
-    tact_pipe_file file = CRIBBIT_EMPTY_TACT_PIPE_FILE;
+    tact_pipe_file file = {0};
 
     file.columns = cribbit_alloc_linked(NULL, sizeof(tact_pipe_column));
     file.rows = cribbit_alloc_linked(NULL, sizeof(tact_pipe_row));
@@ -59,7 +58,6 @@ tact_pipe_file tact_pipe_parse(char* data) {
                 if (has_columns) {
                     current_row = cribbit_alloc_linked(current_row, sizeof(tact_pipe_row));
                     current_row->columns = cribbit_alloc(sizeof(char*) * file.column_count);
-                    cribbit_clear(current_row->columns, sizeof(char*) * file.column_count);
                 }
 
                 int idx = 0;
@@ -205,7 +203,6 @@ tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_
             }
 
             uint8_t* hex = cribbit_alloc(sizeof(uint8_t) * column_entry->width);
-            cribbit_clear(hex, sizeof(uint8_t) * column_entry->width);
             *data = hex;
             *data_len = column_entry->width;
 

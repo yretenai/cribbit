@@ -10,8 +10,6 @@
 #include "ribbit_v1.h"
 #include "ribbit_v2.h"
 
-#include "../cribbit_empty.h"
-
 const char RIBBIT_HOST[20] = ".version.battle.net";
 const int32_t RIBBIT_PORT = 1119;
 
@@ -31,7 +29,7 @@ ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbi
         default:
         case RIBBIT_REGION_INVALID:
         case RIBBIT_REGION_MAX: {
-            ribbit_response response = CRIBBIT_EMPTY_RIBBIT_RESPONSE;
+            ribbit_response response = {0};
             return response;
         }
     }
@@ -50,7 +48,7 @@ ribbit_response ribbit_fetch_direct(const char* host, int32_t port, ribbit_versi
         default:
         case RIBBIT_CLIENT_INVALID:
         case RIBBIT_CLIENT_MAX: {
-            ribbit_response response = CRIBBIT_EMPTY_RIBBIT_RESPONSE;
+            ribbit_response response = {0};
             return response;
         }
     }
