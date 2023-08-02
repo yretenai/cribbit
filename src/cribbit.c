@@ -1,6 +1,6 @@
-//
-// Created by chronovore on 7/16/23.
-//
+// cribbit: interopability with ribbit et al
+// Copyright © 2023 <https://github.com/yretenai/cribbit>
+// SPDX-License-Identifier: MPL-2.0
 
 #include <cribbit/cribbit.h>
 
