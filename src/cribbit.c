@@ -1,5 +1,5 @@
 // cribbit: interopability with ribbit et al
-// Copyright © 2023 <https://github.com/yretenai/cribbit>
+// Copyright (c) 2023 <https://github.com/yretenai/cribbit>
 // SPDX-License-Identifier: MPL-2.0
 
 #include <cribbit/cribbit.h>
