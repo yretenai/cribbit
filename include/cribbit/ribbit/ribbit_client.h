@@ -44,14 +44,23 @@ typedef enum RIBBIT_REGION {
     RIBBIT_REGION_MAX,
 } ribbit_region;
 
-typedef struct RIBBIT_MIME {
-    struct RIBBIT_MIME* next;
+typedef struct RIBBIT_MIME_ENTRY {
+    struct RIBBIT_MIME_ENTRY* next;
     const char* key;
     const char* value;
+} ribbit_mime_entry;
+
+typedef struct RIBBIT_MIME {
+    ribbit_mime_entry* mime;
+    char* data;
 } ribbit_mime;
 
 typedef struct RIBBIT_RESPONSE {
     ribbit_response_type type;
+    ribbit_version version;
+    const char* storage;
+    const char* host;
+    int32_t port;
     tact_pipe_file data;
     ribbit_mime* mime;
     uint8_t* cert;
@@ -59,7 +68,7 @@ typedef struct RIBBIT_RESPONSE {
 } ribbit_response;
 
 CRIBBIT_SHARED ribbit_response CRIBBIT_DECL ribbit_fetch(ribbit_region region, ribbit_version version, ribbit_response_type type, const char* param);
-CRIBBIT_SHARED ribbit_response CRIBBIT_DECL ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param);
+CRIBBIT_SHARED ribbit_response CRIBBIT_DECL ribbit_fetch_direct(const char* host, size_t host_len, int32_t port, ribbit_version version, ribbit_response_type type, const char* param);
 CRIBBIT_SHARED bool CRIBBIT_DECL ribbit_verify_oscp(ribbit_response* resp);
 CRIBBIT_SHARED void CRIBBIT_DECL ribbit_free(ribbit_response* response);
 

@@ -35,7 +35,7 @@ typedef struct TACT_PIPE_ROW {
 } tact_pipe_row;
 
 typedef struct TACT_PIPE_FILE {
-    char* storage;
+    const char* storage;
     size_t column_count;
     tact_pipe_column* columns;
     tact_pipe_row* rows;

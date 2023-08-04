@@ -9,8 +9,7 @@
 
 #ifdef _WIN32
 #include <io.h>
-#include <stdio.h>
-#define cribbit_open(handle, path, flags) _sopen_s(&handle, path, flags, 0, 0)
+#define cribbit_open(handle, path, flags) _sopen_s(&handle, path, flags, SH_DENYNO, 0)
 #define cribbit_seek(handle, offset, whence) _lseek(handle, offset, whence)
 #define cribbit_read(handle, buf, size) ((size_t) _read(handle, buf, size))
 #define cribbit_close _close
@@ -20,6 +19,7 @@
 #define cribbit_seek(handle, offset, whence) lseek(handle, offset, whence)
 #define cribbit_read(handle, buf, size) read(handle, buf, size)
 #define cribbit_close close
+#define O_TEXT 0
 #endif
 
 #endif //CRIBBIT_IO_H

@@ -244,14 +244,14 @@ void tact_pipe_free_value(void* data) {
 }
 
 void tact_pipe_free(tact_pipe_file* file) {
-    if(file->storage != NULL) {
-        cribbit_free(file->storage);
-        file->storage = NULL;
-    }
-
     cribbit_free_linked((struct cribbit_linked_shim *) file->columns);
     file->columns = NULL;
 
     cribbit_free_linked((struct cribbit_linked_shim *) file->rows);
     file->rows = NULL;
+
+    if(file->storage != NULL) {
+        cribbit_free((void*) file->storage);
+        file->storage = NULL;
+    }
 }

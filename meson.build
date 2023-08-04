@@ -11,11 +11,16 @@ threaddep = dependency('threads', required: true)
 incdir = include_directories('include/')
 
 cflags = []
+ldflags = []
 
 if meson.get_compiler('c').get_id() == 'gcc'
     if meson.get_compiler('c').compiles('void test(main) { }', name: 'can use -fanalyzer', args: '-fanalyzer')
       cflags += ['-fanalyzer']
     endif
+endif
+
+if host_machine.system() == 'windows'
+    ldflags += ['-lWs2_32']
 endif
 
 subdir('src')

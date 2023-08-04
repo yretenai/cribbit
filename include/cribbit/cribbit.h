@@ -19,8 +19,10 @@ struct cribbit_linked_shim {
 typedef void (*cribbit_linked_callback)(void *entry, void* userdata);
 
 CRIBBIT_SHARED void* CRIBBIT_DECL cribbit_alloc(size_t size);
+CRIBBIT_SHARED void* CRIBBIT_DECL cribbit_realloc(void* ptr, size_t size);
 CRIBBIT_SHARED void CRIBBIT_DECL cribbit_clear(void* ptr, size_t size);
 CRIBBIT_SHARED void CRIBBIT_DECL cribbit_free(void* ptr);
+
 CRIBBIT_SHARED void* CRIBBIT_DECL cribbit_alloc_linked(void* addr, size_t size);
 CRIBBIT_SHARED void CRIBBIT_DECL cribbit_free_linked(void* addr);
 CRIBBIT_SHARED void* CRIBBIT_DECL cribbit_skip_linked(void* addr, size_t count);

@@ -36,15 +36,15 @@ ribbit_response ribbit_fetch(ribbit_region region, ribbit_version version, ribbi
 
     memcpy(&host[2], RIBBIT_HOST, sizeof(RIBBIT_HOST));
 
-    return ribbit_fetch_direct((const char *) &host, RIBBIT_PORT, version, type, param);
+    return ribbit_fetch_direct((const char *) &host, sizeof(host), RIBBIT_PORT, version, type, param);
 }
 
-ribbit_response ribbit_fetch_direct(const char* host, int32_t port, ribbit_version version, ribbit_response_type type, const char* param) {
+ribbit_response ribbit_fetch_direct(const char* host, size_t host_len, int32_t port, ribbit_version version, ribbit_response_type type, const char* param) {
     switch (version) {
         case RIBBIT_CLIENT_V1:
-            return ribbit_v1_fetch(host, port, type, param);
+            return ribbit_v1_fetch(host, host_len, port, type, param);
         case RIBBIT_CLIENT_V2:
-            return ribbit_v2_fetch(host, port, type, param);
+            return ribbit_v2_fetch(host, host_len, port, type, param);
         default:
         case RIBBIT_CLIENT_INVALID:
         case RIBBIT_CLIENT_MAX: {
@@ -73,5 +73,17 @@ void ribbit_free(ribbit_response* response) {
         response->cert = NULL;
     }
 
+    if(response->storage != NULL) {
+        cribbit_free((void*) response->storage);
+        response->storage = NULL;
+    }
+
+    if(response->host != NULL) {
+        cribbit_free((void*) response->host);
+        response->host = NULL;
+    }
+
     response->type = RIBBIT_RESPONSE_INVALID;
+    response->port = 0;
+    response->version = RIBBIT_CLIENT_INVALID;
 }

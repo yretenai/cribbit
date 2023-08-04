@@ -13,6 +13,10 @@ void* cribbit_alloc(size_t size) {
     return addr;
 }
 
+void* cribbit_realloc(void* ptr, size_t size) {
+    return realloc(ptr, size);
+}
+
 void cribbit_clear(void* ptr, size_t size) {
     memset(ptr, 0, size);
 }
