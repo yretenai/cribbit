@@ -67,6 +67,7 @@ int request_tcp_message(const char *host, int32_t port, const char *message, int
     freeaddrinfo(dns);
 
     if(res == SOCKET_ERROR) {
+        closesocket(sock);
         SOCKET_END;
         return -1;
     }
