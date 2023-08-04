@@ -36,10 +36,9 @@ ribbit_response ribbit_v1_fetch(const char* host, size_t host_len, int32_t port,
         message = param_message;
 
         switch (type) {
-            case RIBBIT_RESPONSE_VERSIONS: {
+            case RIBBIT_RESPONSE_VERSIONS:
                 message_len = snprintf(param_message, sizeof(param_message), V1_VERSIONS, param);
                 break;
-            }
             case RIBBIT_RESPONSE_CDNS:
                 message_len = snprintf(param_message, sizeof(param_message), V1_CDNS, param);
                 break;

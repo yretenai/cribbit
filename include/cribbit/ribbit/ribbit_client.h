@@ -52,7 +52,7 @@ typedef struct RIBBIT_MIME_ENTRY {
 
 typedef struct RIBBIT_MIME {
     ribbit_mime_entry* mime;
-    char* data;
+    const char* data;
 } ribbit_mime;
 
 typedef struct RIBBIT_RESPONSE {
