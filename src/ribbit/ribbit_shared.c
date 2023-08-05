@@ -2,29 +2,32 @@
 // Copyright (c) 2023 <https://github.com/yretenai/cribbit>
 // SPDX-License-Identifier: MPL-2.0
 
-#include "ribbit_shared.h"
-
 #include <stdbool.h>
 #include <stdio.h>
 
 #include <cribbit/cribbit.h>
+#include "ribbit_shared.h"
+#include "../feature/cribbit_string.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2def.h>
 #include <ws2tcpip.h>
-#define SOCKET_START {WSADATA _wsaData; int _wsaErr = WSAStartup(MAKEWORD(2, 2), &_wsaData);}
+#define SOCKET_START {WSADATA _wsaData; WSAStartup(MAKEWORD(2, 2), &_wsaData);}
 #define SOCKET_END WSACleanup()
 #define SOCKET_TYPE SOCKET
 #else
+#define __USE_XOPEN2K
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <unistd.h>
 #define SOCKET_START
 #define SOCKET_END
 #define SOCKET_TYPE int
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
+#define closesocket close
 #endif
 
 #define BUFFER_SIZE 4096

@@ -2,10 +2,10 @@
 // Copyright (c) 2023 <https://github.com/yretenai/cribbit>
 // SPDX-License-Identifier: MPL-2.0
 
-#include <string.h>
-
 #include <cribbit/cribbit.h>
 #include <cribbit/ribbit/ribbit_client.h>
+
+#include "../feature/cribbit_string.h"
 
 #include "ribbit_v1.h"
 #include "ribbit_v2.h"

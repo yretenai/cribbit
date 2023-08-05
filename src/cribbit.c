@@ -4,7 +4,7 @@
 
 #include <cribbit/cribbit.h>
 
-#include <string.h>
+#include "feature/cribbit_string.h"
 
 void* cribbit_alloc(size_t size) {
     // todo: make this configurable.
@@ -18,6 +18,10 @@ void* cribbit_realloc(void* ptr, size_t size) {
 }
 
 void cribbit_clear(void* ptr, size_t size) {
+    if(ptr == NULL) {
+        return;
+    }
+
     memset(ptr, 0, size);
 }
 
@@ -29,6 +33,10 @@ void cribbit_free(void* ptr) {
 void* cribbit_alloc_linked(void* addr, size_t size) {
     struct cribbit_linked_shim* entry = (struct cribbit_linked_shim*) addr;
     struct cribbit_linked_shim* new_addr = cribbit_alloc(size);
+    if(new_addr == NULL) {
+        return NULL;
+    }
+
     new_addr->next = NULL;
 
     if(addr != NULL) {

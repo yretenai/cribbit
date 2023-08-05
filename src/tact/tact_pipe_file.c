@@ -4,12 +4,11 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include <cribbit/cribbit.h>
 #include <cribbit/tact/tact_pipe_file.h>
 
-#include "../feature/string.h"
+#include "../feature/cribbit_string.h"
 
 const char CS_SEQN[] = "## seqn = ";
 
@@ -28,11 +27,17 @@ const char* TACT_PIPE_COLUMN_NAME[] = {
         "MAX"
 };
 
+#define PARSE_HANDLE_OOM(mem, ptr) if(mem == NULL) { tact_pipe_free(&ptr); return ptr; }
+#define CONVERT_HANDLE_OOM(mem) if(mem == NULL) { *data = NULL; *data_len = 0; return TACT_PIPE_COLUMN_INVALID; }
+
 tact_pipe_file tact_pipe_parse(char* data) {
     tact_pipe_file file = {0};
 
     file.columns = cribbit_alloc_linked(NULL, sizeof(tact_pipe_column));
+    PARSE_HANDLE_OOM(file.columns, file);
+
     file.rows = cribbit_alloc_linked(NULL, sizeof(tact_pipe_row));
+    PARSE_HANDLE_OOM(file.rows, file);
 
     bool has_columns = false;
 
@@ -57,7 +62,10 @@ tact_pipe_file tact_pipe_parse(char* data) {
 
                 if (has_columns) {
                     current_row = cribbit_alloc_linked(current_row, sizeof(tact_pipe_row));
+                    PARSE_HANDLE_OOM(current_row, file);
+
                     current_row->columns = cribbit_alloc(sizeof(char*) * file.column_count);
+                    PARSE_HANDLE_OOM(current_row->columns, file);
                 }
 
                 int idx = 0;
@@ -93,6 +101,8 @@ tact_pipe_file tact_pipe_parse(char* data) {
                         file.column_count++;
 
                         current_column = cribbit_alloc_linked(current_column, sizeof(tact_pipe_column));
+                        PARSE_HANDLE_OOM(current_column, file);
+
                         current_column->name = chunk;
                         current_column->width = (int32_t) strtoll(width_sep, NULL, 10);
 
@@ -102,11 +112,11 @@ tact_pipe_file tact_pipe_parse(char* data) {
                             chunk += 1;
                         }
 
-                        if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_STRING]) == 0) {
+                        if(strcasecmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_STRING]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_STRING;
-                        } else if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_HEX]) == 0) {
+                        } else if(strcasecmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_HEX]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_HEX;
-                        } else if(stricmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_DEC]) == 0) {
+                        } else if(strcasecmp(name_sep, TACT_PIPE_COLUMN_NAME[TACT_PIPE_COLUMN_DEC]) == 0) {
                             current_column->type = TACT_PIPE_COLUMN_DEC;
                         }  else {
                             current_column->type = TACT_PIPE_COLUMN_INVALID;
@@ -203,6 +213,7 @@ tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_
             }
 
             uint8_t* hex = cribbit_alloc(sizeof(uint8_t) * column_entry->width);
+            CONVERT_HANDLE_OOM(hex);
             *data = hex;
             *data_len = column_entry->width;
 

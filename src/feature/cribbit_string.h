@@ -5,10 +5,13 @@
 #ifndef CRIBBIT_STRING_H
 #define CRIBBIT_STRING_H
 
+#include <string.h>
+
 #ifdef _WIN32
 #define strtok_r strtok_s
-#define stricmp _stricmp
+#define strcasecmp _stricmp
 #else
+#include <strings.h>
 #endif
 
 #endif //CRIBBIT_STRING_H

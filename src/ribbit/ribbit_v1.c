@@ -2,10 +2,12 @@
 // Copyright (c) 2023 <https://github.com/yretenai/cribbit>
 // SPDX-License-Identifier: MPL-2.0
 
-#include "ribbit_v1.h"
+#include <stdio.h>
 
-#include "ribbit_shared.h"
 #include <cribbit/cribbit.h>
+#include "ribbit_v1.h"
+#include "ribbit_shared.h"
+#include "../feature/cribbit_string.h"
 
 #define V1_SUMMARY "v1/summary"
 #define V1_VERSIONS "v1/products/%s/versions"
@@ -15,9 +17,6 @@
 #define V1_OSCP "v1/oscp/%s"
 
 #define PARAM_BUFFER 128
-
-#include <stdio.h>
-#include <string.h>
 
 ribbit_response ribbit_v1_fetch(const char* host, size_t host_len, int32_t port, ribbit_response_type type, const char* param) {
     ribbit_response response = {0};
