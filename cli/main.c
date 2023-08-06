@@ -61,6 +61,9 @@ void print_tact(tact_pipe_file file) {
 }
 
 int main(void) {
+    cribbit_set_libc();
+    cribbit_set_printf();
+
     ribbit_response resp = ribbit_fetch(RIBBIT_REGION_US, RIBBIT_CLIENT_V2, RIBBIT_RESPONSE_VERSIONS, "wow");
 
     print_tact(resp.data);

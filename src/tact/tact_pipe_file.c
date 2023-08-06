@@ -64,7 +64,7 @@ tact_pipe_file tact_pipe_parse(char* data) {
                     current_row = cribbit_alloc_linked(current_row, sizeof(tact_pipe_row));
                     PARSE_HANDLE_OOM(current_row, file);
 
-                    current_row->columns = cribbit_alloc(sizeof(char*) * file.column_count);
+                    current_row->columns = cribbit_alloc(file.column_count, sizeof(char*));
                     PARSE_HANDLE_OOM(current_row->columns, file);
                 }
 
@@ -212,7 +212,7 @@ tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_
                 return TACT_PIPE_COLUMN_INVALID;
             }
 
-            uint8_t* hex = cribbit_alloc(sizeof(uint8_t) * column_entry->width);
+            uint8_t* hex = cribbit_alloc(column_entry->width, sizeof(uint8_t));
             CONVERT_HANDLE_OOM(hex);
             *data = hex;
             *data_len = column_entry->width;

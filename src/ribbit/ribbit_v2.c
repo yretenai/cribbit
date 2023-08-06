@@ -62,7 +62,7 @@ ribbit_response ribbit_v2_fetch(const char* host, size_t host_len, int32_t port,
         return response;
     }
 
-    response.host = cribbit_alloc(host_len);
+    response.host = cribbit_alloc(host_len, sizeof(char));
     memcpy((void*) response.host, host, host_len);
     response.port = port;
     response.version = RIBBIT_CLIENT_V2;

@@ -37,9 +37,7 @@ int request_tcp_message(const char *host, int32_t port, const char *message, int
     SOCKET_START;
 #endif
 
-#ifndef _NDEBUG
-    printf("cribbit: requesting tcp %s:%d/%s\n", host, port, message);
-#endif
+    cribbit_log("cribbit: requesting tcp %s:%d/%s\n", host, port, message);
 
     *output = NULL;
 
