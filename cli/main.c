@@ -7,9 +7,8 @@
 
 #include <stdio.h>
 
-void print_column(void *entry, void* userdata) {
+void print_column(void *entry, __attribute__((unused)) void* userdata) {
     tact_pipe_column* column = entry;
-    tact_pipe_file* file = userdata;
     printf("%s is %s (%d)\n", column->name, TACT_PIPE_COLUMN_NAME[column->type], column->width);
 }
 
