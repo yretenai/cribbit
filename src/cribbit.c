@@ -14,7 +14,6 @@ cribbit_free_callback cribbit_free_cb = NULL;
 cribbit_log_calblack cribbit_log_cb = NULL;
 
 void* cribbit_alloc_libc(size_t elements, size_t size) {
-    // todo: make this configurable.
     return calloc(elements, size);
 }
 
@@ -31,7 +30,6 @@ void cribbit_clear_libc(void* ptr, size_t size) {
 }
 
 void cribbit_free_libc(void* ptr) {
-    // todo: make this configurable.
     free(ptr);
 }
 
