@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include <stdbool.h>
-#include <stdio.h>
 
 #include <cribbit/cribbit.h>
 #include "ribbit_shared.h"
@@ -34,7 +33,7 @@
 
 int request_tcp_message(const char *host, int32_t port, const char *message, int32_t message_len, char **output) {
 #if _WIN32
-    SOCKET_START;
+    SOCKET_START
 #endif
 
     cribbit_log("cribbit: requesting tcp %s:%d/%s\n", host, port, message);
