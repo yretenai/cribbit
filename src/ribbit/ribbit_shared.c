@@ -95,7 +95,7 @@ int request_tcp_message(const char *host, int32_t port, const char *message, int
             break;
         }
 
-        char* tmp = cribbit_realloc(resp, resp_size + size);
+        char* tmp = cribbit_realloc(resp, resp_size + size + 1);
         if(tmp == NULL) {
             cribbit_free(resp);
             resp = NULL;
@@ -106,6 +106,7 @@ int request_tcp_message(const char *host, int32_t port, const char *message, int
 
         memcpy(resp + resp_size, buffer, size);
         resp_size += size;
+        tmp[resp_size] = 0;
     }
 
     closesocket(sock);

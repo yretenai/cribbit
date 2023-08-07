@@ -34,10 +34,10 @@ tact_pipe_file tact_pipe_parse(char* data) {
     tact_pipe_file file = {0};
 
     file.columns = cribbit_alloc_linked(NULL, sizeof(tact_pipe_column));
-    PARSE_HANDLE_OOM(file.columns, file);
+    PARSE_HANDLE_OOM(file.columns, file)
 
     file.rows = cribbit_alloc_linked(NULL, sizeof(tact_pipe_row));
-    PARSE_HANDLE_OOM(file.rows, file);
+    PARSE_HANDLE_OOM(file.rows, file)
 
     bool has_columns = false;
 
@@ -62,10 +62,10 @@ tact_pipe_file tact_pipe_parse(char* data) {
 
                 if (has_columns) {
                     current_row = cribbit_alloc_linked(current_row, sizeof(tact_pipe_row));
-                    PARSE_HANDLE_OOM(current_row, file);
+                    PARSE_HANDLE_OOM(current_row, file)
 
                     current_row->columns = cribbit_alloc(file.column_count, sizeof(char*));
-                    PARSE_HANDLE_OOM(current_row->columns, file);
+                    PARSE_HANDLE_OOM(current_row->columns, file)
                 }
 
                 int idx = 0;
@@ -101,7 +101,7 @@ tact_pipe_file tact_pipe_parse(char* data) {
                         file.column_count++;
 
                         current_column = cribbit_alloc_linked(current_column, sizeof(tact_pipe_column));
-                        PARSE_HANDLE_OOM(current_column, file);
+                        PARSE_HANDLE_OOM(current_column, file)
 
                         current_column->name = chunk;
                         current_column->width = (int32_t) strtoll(width_sep, NULL, 10);
@@ -213,7 +213,7 @@ tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_
             }
 
             uint8_t* hex = cribbit_alloc(column_entry->width, sizeof(uint8_t));
-            CONVERT_HANDLE_OOM(hex);
+            CONVERT_HANDLE_OOM(hex)
             *data = hex;
             *data_len = column_entry->width;
 
@@ -254,10 +254,17 @@ void tact_pipe_free_value(void* data) {
     cribbit_free(data);
 }
 
+void tact_pipe_free_row(void *entry, __attribute__((unused)) void* userdata) {
+    tact_pipe_row* row = entry;
+    cribbit_free(row->columns);
+    row->columns = NULL;
+}
+
 void tact_pipe_free(tact_pipe_file* file) {
     cribbit_free_linked((struct cribbit_linked_shim *) file->columns);
     file->columns = NULL;
 
+    cribbit_iterate_linked(file->rows, tact_pipe_free_row, NULL);
     cribbit_free_linked((struct cribbit_linked_shim *) file->rows);
     file->rows = NULL;
 
