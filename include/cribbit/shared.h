@@ -14,7 +14,7 @@
 #endif
 #else
 #define CRIBBIT_DECL
-#define CRIBBIT_SHARED __attribute__((unused))
+#define CRIBBIT_SHARED __attribute__ ((visibility ("default"))) __attribute__((unused))
 #endif
 
 #endif //CRIBBIT_SHARED_H

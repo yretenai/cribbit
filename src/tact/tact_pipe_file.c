@@ -10,6 +10,8 @@
 
 #include "../feature/cribbit_string.h"
 
+#include "tact_pipe_internal.h"
+
 const char CS_SEQN[] = "## seqn = ";
 
 const char NAME_TYPE_SEPARATOR = '!';
@@ -32,7 +34,6 @@ const char* TACT_PIPE_COLUMN_NAME[] = {
 
 tact_pipe_file tact_pipe_parse(char* data) {
     tact_pipe_file file = {0};
-
     file.columns = cribbit_alloc_linked(NULL, sizeof(tact_pipe_column));
     PARSE_HANDLE_OOM(file.columns, file)
 
@@ -142,6 +143,13 @@ tact_pipe_file tact_pipe_parse(char* data) {
     return file;
 }
 
+tact_pipe_file tact_file_init(const char* data) {
+    char *dup = _strdup(data);
+    tact_pipe_file file = tact_pipe_parse(dup);
+    file.storage = dup;
+    return file;
+}
+
 tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, size_t row, void** data, size_t* data_len) {
     if (data == NULL || data_len == NULL) {
         return TACT_PIPE_COLUMN_INVALID;
@@ -162,17 +170,21 @@ tact_pipe_column_type tact_pipe_get(tact_pipe_file* file, const char* column, si
     return TACT_PIPE_COLUMN_INVALID;
 }
 
-uint8_t parse_octet(const char value) {
+uint8_t parse_octet(char ch) {
+    uint8_t value = ch;
     if (value >= '0' && value <= '9') {
         return value - '0';
-    } else if (value >= 'A' && value <= 'F') {
-        return 10 + value - 'A';
-    } else if (value >= 'a' && value <= 'f') {
-        return 10 + value - 'a';
-    } else {
-        return 0;
     }
+
+    value = value | 0x20; // set 6th bit.
+
+    if (value >= 'a' && value <= 'f') {
+        return 9 + (value & 0xF);
+    }
+
+    return 0;
 }
+
 
 tact_pipe_column_type tact_pipe_get_idx(tact_pipe_file* file, size_t column, size_t row, void** data, size_t* data_len) {
     if (data == NULL || data_len == NULL) {
@@ -236,7 +248,7 @@ tact_pipe_column_type tact_pipe_convert(size_t column, tact_pipe_column* column_
                 return TACT_PIPE_COLUMN_INVALID;
             }
             *data_len = column_entry->width;
-            *data = (void *) strtoll(column_value, NULL, 10);
+            *data = (void *) (int64_t) strtoll(column_value, NULL, 10);
             break;
         }
         default:

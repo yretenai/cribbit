@@ -10,6 +10,7 @@ cribbitlib = library('cribbit', [
     dependencies : [threaddep],
     install: true,
     link_args: ldflags,
+    gnu_symbol_visibility: 'hidden',
     c_args: cflags + ['-DCRIBBIT_EXPORTING'])
 
 cribbitdep = declare_dependency(link_with: cribbitlib, include_directories: incdir)

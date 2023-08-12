@@ -5,6 +5,7 @@
 #ifndef CRIBBIT_STRING_H
 #define CRIBBIT_STRING_H
 
+#define __USE_GNU
 #include <string.h>
 
 #ifdef _WIN32
@@ -12,6 +13,7 @@
 #define strcasecmp _stricmp
 #else
 #include <strings.h>
+#define _strdup strdup
 #endif
 
 #endif //CRIBBIT_STRING_H

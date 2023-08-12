@@ -42,7 +42,7 @@ typedef struct TACT_PIPE_FILE {
     int64_t seqn;
 } tact_pipe_file;
 
-CRIBBIT_SHARED tact_pipe_file CRIBBIT_DECL tact_pipe_parse(char* data);
+CRIBBIT_SHARED tact_pipe_file CRIBBIT_DECL tact_file_init(const char* data);
 CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_get(tact_pipe_file* file, const char* column, size_t row, void** data, size_t* data_len);
 CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_get_idx(tact_pipe_file* file, size_t column, size_t row, void** data, size_t* data_len);
 CRIBBIT_SHARED tact_pipe_column_type CRIBBIT_DECL tact_pipe_convert(size_t column, tact_pipe_column* column_entry, tact_pipe_row* row_entry, void** data, size_t* data_len);
