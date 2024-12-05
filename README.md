@@ -1,2 +1,2 @@
 # cribbit
-C Ribbit/TACT + CASC + BLTE + TVFS Handler.
+Blizzard Ribbit Handler in C
